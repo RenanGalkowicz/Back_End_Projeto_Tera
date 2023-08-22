@@ -9,17 +9,14 @@ dotenv.config()
 const SECRET = process.env.SECRET
 
 const login = async (req, res) => {
+
     try {
-
         const user = await userSchema.findOne({email: req.body.email}).exec()
-
-        if (user.length == 0) {
+        if (!user) {
             res.status(401).json({
                 statusCode: 401,
-                message: "Usuário não encontrado!",
-                data: {
-                    email: req.body.email
-                }
+                message: "Usuário ou Senha Incorretos!",
+                data: {}
             })
         }
         const result = bcrypt.compareSync(req.body.password, user.password)
@@ -27,7 +24,7 @@ const login = async (req, res) => {
         if (!result) {
             res.status(401).json({
                 statusCode: 401,
-                message: "Usuário não autorizado!",
+                message: "Usuário ou Senha Incorretos!",
                 data: {}
             })
         }
@@ -35,26 +32,19 @@ const login = async (req, res) => {
         user.password = undefined
 
         const token  = jwt.sign({user}, SECRET,{
-            expiresIn: 60 * 60
+            expiresIn: 300
         })
-
+        delete user.password
         res.status(200).json({
             statusCode: 200,
             message: "Login Realizado com sucesso",
             data: {
-                token
+                token,
+                user
             }
         })
-        
     } catch (error) {
-        res.status(500).json({
-            statusCode: 500,
-            message: "Erro ao executar a consulta",
-            data: {
-                error: error.message
             }
-        })
-    }
 }
 
 export default {

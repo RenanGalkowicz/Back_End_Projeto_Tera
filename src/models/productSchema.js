@@ -20,7 +20,7 @@ const productSchema = new Schema(
             required: true,
         },
         priceProduct: {
-            type: Number,
+            type: String,
             required: true,
         },
         //Corrigir o tipo de entrada, será uma entrada de imagem//
